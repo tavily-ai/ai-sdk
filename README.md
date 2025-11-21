@@ -4,10 +4,10 @@ AI SDK tools for Tavily, built for Vercel's AI SDK v5.
 
 ## Features
 
-- 🔍 **Search**: Real-time web search optimized for AI applications
-- 📄 **Extract**: Clean, structured content extraction from URLs
-- 🕷️ **Crawl**: Intelligent website crawling at scale
-- 🗺️ **Map**: Website structure discovery and mapping
+- **Search**: Real-time web search optimized for AI applications
+- **Extract**: Clean, structured content extraction from URLs
+- **Crawl**: Intelligent website crawling at scale
+- **Map**: Website structure discovery and mapping
 
 ## Installation
 
@@ -206,39 +206,6 @@ pnpm install
 ```bash
 TAVILY_API_KEY=tvly-your-api-key
 VERCEL_AI_GATEWAY_URL=your-gateway-url
-```
-
-### Testing
-
-Test the tools locally:
-
-```bash
-pnpm test
-```
-
-### Building
-
-Build the package:
-
-```bash
-pnpm build
-```
-
-## Project Structure
-
-```
-.
-├── src/
-│   ├── tools/
-│   │   ├── tavily-search.ts    # Search tool implementation
-│   │   ├── tavily-extract.ts   # Extract tool implementation
-│   │   ├── tavily-crawl.ts     # Crawl tool implementation
-│   │   └── tavily-map.ts       # Map tool implementation
-│   ├── index.ts                # Tool exports
-│   └── test.ts                 # Test script
-├── package.json
-├── tsconfig.json
-└── README.md
 ```
 
 ## API Reference
