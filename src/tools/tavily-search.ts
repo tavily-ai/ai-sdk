@@ -8,6 +8,20 @@ type TavilySearchOptions = {
   includeImages?: boolean;
   includeAnswer?: boolean;
   maxResults?: number;
+  includeImageDescriptions?: boolean;
+  includeRawContent?: false | "markdown" | "text";
+  includeDomains?: string[];
+  excludeDomains?: string[];
+  timeRange?: "year" | "month" | "week" | "day" | "y" | "m" | "w" | "d";
+  country?: string;
+  chunksPerSource?: number;
+  startDate?: string;
+  endDate?: string;
+  autoParameters?: boolean;
+  maxTokens?: number;
+  includeFavicon?: boolean;
+  timeout?: number;
+  days?: number;
 };
 
 /**
@@ -21,6 +35,20 @@ export const tavilySearch = ({
   includeImages = false,
   includeAnswer = false,
   maxResults = 5,
+  includeImageDescriptions,
+  includeRawContent,
+  includeDomains,
+  excludeDomains,
+  timeRange,
+  country,
+  chunksPerSource,
+  startDate,
+  endDate,
+  autoParameters,
+  maxTokens,
+  includeFavicon,
+  timeout = 60,
+  days,
 }: TavilySearchOptions = {}) =>
   tool({
     description:
@@ -29,40 +57,6 @@ export const tavilySearch = ({
       query: z
         .string()
         .describe("The search query to look up on the web"),
-      searchDepth: z
-        .enum(["basic", "advanced"])
-        .optional()
-        .describe(
-          "The depth of the search - 'basic' for quick results, 'advanced' for comprehensive search"
-        ),
-      topic: z
-        .enum(["general", "news", "finance"])
-        .optional()
-        .describe("The category of the search"),
-      days: z
-        .number()
-        .optional()
-        .describe("Number of days back to search (for news and finance topics)"),
-      maxResults: z
-        .number()
-        .optional()
-        .describe("Maximum number of search results to return (default: 5)"),
-      includeImages: z
-        .boolean()
-        .optional()
-        .describe("Whether to include relevant images in the results"),
-      includeImageDescriptions: z
-        .boolean()
-        .optional()
-        .describe("Whether to include AI-generated image descriptions"),
-      includeAnswer: z
-        .boolean()
-        .optional()
-        .describe("Whether to include an AI-generated answer to the query"),
-      includeRawContent: z
-        .enum(["markdown", "text"])
-        .optional()
-        .describe("Include raw content in specified format"),
       includeDomains: z
         .array(z.string())
         .optional()
@@ -71,29 +65,48 @@ export const tavilySearch = ({
         .array(z.string())
         .optional()
         .describe("List of domains to exclude from the search"),
+      searchDepth: z
+        .enum(["basic", "advanced"])
+        .optional()
+        .describe(
+          "The depth of the search - 'basic' for quick results, 'advanced' for comprehensive search"
+        ),
+      includeImages: z
+        .boolean()
+        .optional()
+        .describe("Whether to include relevant images in the results"),
       timeRange: z
         .enum(["year", "month", "week", "day", "y", "m", "w", "d"])
         .optional()
         .describe("Time range for search results"),
-      country: z
+      topic: z
+        .enum(["general", "news", "finance"])
+        .optional()
+        .describe("The category of the search"),
+      includeFavicon: z
+        .boolean()
+        .optional()
+        .describe("Whether to include favicon URLs in the results"),
+      startDate: z
         .string()
         .optional()
-        .describe("Country code for localized search (e.g., 'US', 'GB')"),
+        .describe("Start date for search results (format: YYYY-MM-DD)"),
+      endDate: z
+        .string()
+        .optional()
+        .describe("End date for search results (format: YYYY-MM-DD)"),
     }),
     execute: async ({
       query,
+      includeDomains: inputIncludeDomains,
+      excludeDomains: inputExcludeDomains,
       searchDepth: inputSearchDepth,
-      topic: inputTopic,
-      days,
-      maxResults: inputMaxResults,
       includeImages: inputIncludeImages,
-      includeImageDescriptions,
-      includeAnswer: inputIncludeAnswer,
-      includeRawContent,
-      includeDomains,
-      excludeDomains,
-      timeRange,
-      country,
+      timeRange: inputTimeRange,
+      topic: inputTopic,
+      includeFavicon: inputIncludeFavicon,
+      startDate: inputStartDate,
+      endDate: inputEndDate,
     }) => {
       const effectiveApiKey = apiKey || process.env.TAVILY_API_KEY;
 
@@ -105,24 +118,50 @@ export const tavilySearch = ({
 
       const requestBody: Record<string, any> = {
         query,
-        search_depth: inputSearchDepth || searchDepth,
-        topic: inputTopic || topic,
-        max_results: inputMaxResults || maxResults,
+        search_depth: inputSearchDepth ?? searchDepth,
+        topic: inputTopic ?? topic,
+        max_results: maxResults,
         include_images: inputIncludeImages ?? includeImages,
-        include_answer: inputIncludeAnswer ?? includeAnswer,
+        include_answer: includeAnswer,
       };
 
-      // Add optional parameters only if provided
+      // Add agent-controllable parameters if provided
+      if (inputIncludeDomains && inputIncludeDomains.length > 0)
+        requestBody.include_domains = inputIncludeDomains;
+      else if (includeDomains && includeDomains.length > 0)
+        requestBody.include_domains = includeDomains;
+      
+      if (inputExcludeDomains && inputExcludeDomains.length > 0)
+        requestBody.exclude_domains = inputExcludeDomains;
+      else if (excludeDomains && excludeDomains.length > 0)
+        requestBody.exclude_domains = excludeDomains;
+      
+      if (inputTimeRange) requestBody.time_range = inputTimeRange;
+      else if (timeRange) requestBody.time_range = timeRange;
+      
+      if (inputStartDate) requestBody.start_date = inputStartDate;
+      else if (startDate) requestBody.start_date = startDate;
+      
+      if (inputEndDate) requestBody.end_date = inputEndDate;
+      else if (endDate) requestBody.end_date = endDate;
+      
+      if (inputIncludeFavicon !== undefined)
+        requestBody.include_favicon = inputIncludeFavicon;
+      else if (includeFavicon !== undefined)
+        requestBody.include_favicon = includeFavicon;
+
+      // Add developer-only parameters from closure
       if (days !== undefined) requestBody.days = days;
       if (includeImageDescriptions !== undefined)
         requestBody.include_image_descriptions = includeImageDescriptions;
       if (includeRawContent) requestBody.include_raw_content = includeRawContent;
-      if (includeDomains && includeDomains.length > 0)
-        requestBody.include_domains = includeDomains;
-      if (excludeDomains && excludeDomains.length > 0)
-        requestBody.exclude_domains = excludeDomains;
-      if (timeRange) requestBody.time_range = timeRange;
       if (country) requestBody.country = country;
+      if (chunksPerSource !== undefined)
+        requestBody.chunks_per_source = chunksPerSource;
+      if (autoParameters !== undefined)
+        requestBody.auto_parameters = autoParameters;
+      if (maxTokens !== undefined) requestBody.max_tokens = maxTokens;
+      if (timeout !== undefined) requestBody.timeout = timeout;
 
       try {
         const response = await fetch("https://api.tavily.com/search", {

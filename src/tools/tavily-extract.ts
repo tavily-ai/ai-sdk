@@ -3,42 +3,42 @@ import { z } from "zod";
 
 type TavilyExtractOptions = {
   apiKey?: string;
+  includeImages?: boolean;
+  includeFavicon?: boolean;
+  extractDepth?: "basic" | "advanced";
+  format?: "markdown" | "text";
+  timeout?: number;
 };
 
 /**
  * Tavily Extract tool for AI SDK
  * Extracts structured content from specified URLs with AI-optimized parsing
  */
-export const tavilyExtract = ({ apiKey }: TavilyExtractOptions = {}) =>
+export const tavilyExtract = ({
+  apiKey,
+  includeImages = false,
+  includeFavicon,
+  extractDepth = "basic",
+  format = "markdown",
+  timeout = 30,
+}: TavilyExtractOptions = {}) =>
   tool({
     description:
       "Extract clean, structured content from one or more URLs. Returns parsed content in markdown or text format, optimized for AI consumption.",
     inputSchema: z.object({
       urls: z
-        .array(z.string().url())
+        .array(z.string())
         .describe("Array of URLs to extract content from"),
-      includeImages: z
-        .boolean()
-        .optional()
-        .describe(
-          "Whether to include images from the extracted content (default: false)"
-        ),
       extractDepth: z
         .enum(["basic", "advanced"])
         .optional()
         .describe(
           "Extraction depth - 'basic' for main content, 'advanced' for comprehensive extraction (default: 'basic')"
         ),
-      format: z
-        .enum(["markdown", "text"])
-        .optional()
-        .describe("Output format - 'markdown' or 'text' (default: 'markdown')"),
     }),
     execute: async ({
       urls,
-      includeImages = false,
-      extractDepth = "basic",
-      format = "markdown",
+      extractDepth: inputExtractDepth,
     }) => {
       const effectiveApiKey = apiKey || process.env.TAVILY_API_KEY;
 
@@ -48,12 +48,17 @@ export const tavilyExtract = ({ apiKey }: TavilyExtractOptions = {}) =>
         );
       }
 
-      const requestBody = {
+      const requestBody: Record<string, any> = {
         urls,
         include_images: includeImages,
-        extract_depth: extractDepth,
+        extract_depth: inputExtractDepth ?? extractDepth,
         format,
       };
+
+      // Add optional parameters only if provided
+      if (includeFavicon !== undefined)
+        requestBody.include_favicon = includeFavicon;
+      if (timeout !== undefined) requestBody.timeout = timeout;
 
       try {
         const response = await fetch("https://api.tavily.com/extract", {

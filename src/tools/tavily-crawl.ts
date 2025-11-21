@@ -3,20 +3,45 @@ import { z } from "zod";
 
 type TavilyCrawlOptions = {
   apiKey?: string;
+  maxDepth?: number;
+  maxBreadth?: number;
+  limit?: number;
+  extractDepth?: "basic" | "advanced";
+  format?: "markdown" | "text";
+  selectPaths?: string[];
+  selectDomains?: string[];
+  excludePaths?: string[];
+  excludeDomains?: string[];
+  includeImages?: boolean;
+  includeFavicon?: boolean;
+  timeout?: number;
 };
 
 /**
  * Tavily Crawl tool for AI SDK
  * Crawls a website starting from a base URL to discover and extract content from multiple pages
  */
-export const tavilyCrawl = ({ apiKey }: TavilyCrawlOptions = {}) =>
+export const tavilyCrawl = ({
+  apiKey,
+  maxDepth = 1,
+  maxBreadth = 20,
+  limit = 50,
+  extractDepth = "basic",
+  format = "markdown",
+  selectPaths,
+  selectDomains,
+  excludePaths,
+  excludeDomains,
+  includeImages = false,
+  includeFavicon,
+  timeout = 150,
+}: TavilyCrawlOptions = {}) =>
   tool({
     description:
       "Crawl a website starting from a base URL to discover and extract content from multiple pages. Intelligently traverses links and extracts structured data at scale.",
     inputSchema: z.object({
       url: z
         .string()
-        .url()
         .describe("The base URL to start crawling from"),
       maxDepth: z
         .number()
@@ -26,19 +51,6 @@ export const tavilyCrawl = ({ apiKey }: TavilyCrawlOptions = {}) =>
         .describe(
           "Maximum depth to crawl (number of link hops from the base URL, default: 1)"
         ),
-      maxBreadth: z
-        .number()
-        .min(1)
-        .max(100)
-        .optional()
-        .describe(
-          "Maximum number of pages to crawl per depth level (default: 20)"
-        ),
-      limit: z
-        .number()
-        .min(1)
-        .optional()
-        .describe("Maximum total number of pages to crawl (default: 50)"),
       extractDepth: z
         .enum(["basic", "advanced"])
         .optional()
@@ -49,49 +61,17 @@ export const tavilyCrawl = ({ apiKey }: TavilyCrawlOptions = {}) =>
         .describe(
           "Optional instructions to guide the crawler (e.g., 'only crawl blog posts', 'focus on product pages')"
         ),
-      selectPaths: z
-        .array(z.string())
-        .optional()
-        .describe("Array of path patterns to include (e.g., ['/blog/*', '/docs/*'])"),
-      selectDomains: z
-        .array(z.string())
-        .optional()
-        .describe("Array of domains to include in crawling"),
-      excludePaths: z
-        .array(z.string())
-        .optional()
-        .describe("Array of path patterns to exclude"),
-      excludeDomains: z
-        .array(z.string())
-        .optional()
-        .describe("Array of domains to exclude from crawling"),
       allowExternal: z
         .boolean()
         .optional()
         .describe("Whether to allow crawling external domains (default: false)"),
-      includeImages: z
-        .boolean()
-        .optional()
-        .describe("Whether to include images in extracted content (default: false)"),
-      format: z
-        .enum(["markdown", "text"])
-        .optional()
-        .describe("Output format for extracted content (default: 'markdown')"),
     }),
     execute: async ({
       url,
-      maxDepth = 1,
-      maxBreadth = 20,
-      limit = 50,
-      extractDepth = "basic",
-      instructions,
-      selectPaths,
-      selectDomains,
-      excludePaths,
-      excludeDomains,
-      allowExternal,
-      includeImages,
-      format = "markdown",
+      maxDepth: inputMaxDepth,
+      extractDepth: inputExtractDepth,
+      instructions: inputInstructions,
+      allowExternal: inputAllowExternal,
     }) => {
       const effectiveApiKey = apiKey || process.env.TAVILY_API_KEY;
 
@@ -103,15 +83,20 @@ export const tavilyCrawl = ({ apiKey }: TavilyCrawlOptions = {}) =>
 
       const requestBody: Record<string, any> = {
         url,
-        max_depth: maxDepth,
+        max_depth: inputMaxDepth ?? maxDepth,
         max_breadth: maxBreadth,
         limit,
-        extract_depth: extractDepth,
+        extract_depth: inputExtractDepth ?? extractDepth,
         format,
+        include_images: includeImages,
       };
 
-      // Add optional parameters only if provided
-      if (instructions) requestBody.instructions = instructions;
+      // Add agent-controllable parameters if provided
+      if (inputInstructions) requestBody.instructions = inputInstructions;
+      if (inputAllowExternal !== undefined)
+        requestBody.allow_external = inputAllowExternal;
+
+      // Add developer-only parameters from closure
       if (selectPaths && selectPaths.length > 0)
         requestBody.select_paths = selectPaths;
       if (selectDomains && selectDomains.length > 0)
@@ -120,10 +105,9 @@ export const tavilyCrawl = ({ apiKey }: TavilyCrawlOptions = {}) =>
         requestBody.exclude_paths = excludePaths;
       if (excludeDomains && excludeDomains.length > 0)
         requestBody.exclude_domains = excludeDomains;
-      if (allowExternal !== undefined)
-        requestBody.allow_external = allowExternal;
-      if (includeImages !== undefined)
-        requestBody.include_images = includeImages;
+      if (includeFavicon !== undefined)
+        requestBody.include_favicon = includeFavicon;
+      if (timeout !== undefined) requestBody.timeout = timeout;
 
       try {
         const response = await fetch("https://api.tavily.com/crawl", {

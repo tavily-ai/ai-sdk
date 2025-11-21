@@ -3,20 +3,41 @@ import { z } from "zod";
 
 type TavilyMapOptions = {
   apiKey?: string;
+  maxDepth?: number;
+  maxBreadth?: number;
+  limit?: number;
+  selectPaths?: string[];
+  selectDomains?: string[];
+  excludePaths?: string[];
+  excludeDomains?: string[];
+  allowExternal?: boolean;
+  instructions?: string;
+  timeout?: number;
 };
 
 /**
  * Tavily Map tool for AI SDK
  * Maps the structure of a website to discover and organize its pages and hierarchy
  */
-export const tavilyMap = ({ apiKey }: TavilyMapOptions = {}) =>
+export const tavilyMap = ({
+  apiKey,
+  maxDepth = 1,
+  maxBreadth = 20,
+  limit = 50,
+  selectPaths,
+  selectDomains,
+  excludePaths,
+  excludeDomains,
+  allowExternal,
+  instructions,
+  timeout = 150,
+}: TavilyMapOptions = {}) =>
   tool({
     description:
       "Map the structure of a website starting from a base URL. Discovers pages, links, and site hierarchy without extracting full content. Ideal for understanding site architecture.",
     inputSchema: z.object({
       url: z
         .string()
-        .url()
         .describe("The base URL to start mapping from"),
       maxDepth: z
         .number()
@@ -26,41 +47,12 @@ export const tavilyMap = ({ apiKey }: TavilyMapOptions = {}) =>
         .describe(
           "Maximum depth to map (number of link hops from the base URL, default: 1)"
         ),
-      maxBreadth: z
-        .number()
-        .min(1)
-        .max(100)
-        .optional()
-        .describe(
-          "Maximum number of pages to map per depth level (default: 20)"
-        ),
-      limit: z
-        .number()
-        .min(1)
-        .optional()
-        .describe("Maximum total number of pages to map (default: 50)"),
       instructions: z
         .string()
         .optional()
         .describe(
           "Optional instructions to guide the mapping (e.g., 'focus on documentation pages', 'skip API references')"
         ),
-      selectPaths: z
-        .array(z.string())
-        .optional()
-        .describe("Array of path patterns to include (e.g., ['/blog/*', '/docs/*'])"),
-      selectDomains: z
-        .array(z.string())
-        .optional()
-        .describe("Array of domains to include in mapping"),
-      excludePaths: z
-        .array(z.string())
-        .optional()
-        .describe("Array of path patterns to exclude"),
-      excludeDomains: z
-        .array(z.string())
-        .optional()
-        .describe("Array of domains to exclude from mapping"),
       allowExternal: z
         .boolean()
         .optional()
@@ -68,15 +60,9 @@ export const tavilyMap = ({ apiKey }: TavilyMapOptions = {}) =>
     }),
     execute: async ({
       url,
-      maxDepth = 1,
-      maxBreadth = 20,
-      limit = 50,
-      instructions,
-      selectPaths,
-      selectDomains,
-      excludePaths,
-      excludeDomains,
-      allowExternal,
+      maxDepth: inputMaxDepth,
+      instructions: inputInstructions,
+      allowExternal: inputAllowExternal,
     }) => {
       const effectiveApiKey = apiKey || process.env.TAVILY_API_KEY;
 
@@ -88,13 +74,21 @@ export const tavilyMap = ({ apiKey }: TavilyMapOptions = {}) =>
 
       const requestBody: Record<string, any> = {
         url,
-        max_depth: maxDepth,
+        max_depth: inputMaxDepth ?? maxDepth,
         max_breadth: maxBreadth,
         limit,
       };
 
-      // Add optional parameters only if provided
-      if (instructions) requestBody.instructions = instructions;
+      // Add agent-controllable parameters if provided
+      if (inputInstructions) requestBody.instructions = inputInstructions;
+      else if (instructions) requestBody.instructions = instructions;
+      
+      if (inputAllowExternal !== undefined)
+        requestBody.allow_external = inputAllowExternal;
+      else if (allowExternal !== undefined)
+        requestBody.allow_external = allowExternal;
+
+      // Add developer-only parameters from closure
       if (selectPaths && selectPaths.length > 0)
         requestBody.select_paths = selectPaths;
       if (selectDomains && selectDomains.length > 0)
@@ -103,8 +97,7 @@ export const tavilyMap = ({ apiKey }: TavilyMapOptions = {}) =>
         requestBody.exclude_paths = excludePaths;
       if (excludeDomains && excludeDomains.length > 0)
         requestBody.exclude_domains = excludeDomains;
-      if (allowExternal !== undefined)
-        requestBody.allow_external = allowExternal;
+      if (timeout !== undefined) requestBody.timeout = timeout;
 
       try {
         const response = await fetch("https://api.tavily.com/map", {
