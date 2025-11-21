@@ -57,57 +57,8 @@ export const tavilySearch = ({
       query: z
         .string()
         .describe("The search query to look up on the web"),
-      includeDomains: z
-        .array(z.string())
-        .optional()
-        .describe("List of domains to specifically include in the search"),
-      excludeDomains: z
-        .array(z.string())
-        .optional()
-        .describe("List of domains to exclude from the search"),
-      searchDepth: z
-        .enum(["basic", "advanced"])
-        .optional()
-        .describe(
-          "The depth of the search - 'basic' for quick results, 'advanced' for comprehensive search"
-        ),
-      includeImages: z
-        .boolean()
-        .optional()
-        .describe("Whether to include relevant images in the results"),
-      timeRange: z
-        .enum(["year", "month", "week", "day", "y", "m", "w", "d"])
-        .optional()
-        .describe("Time range for search results"),
-      topic: z
-        .enum(["general", "news", "finance"])
-        .optional()
-        .describe("The category of the search"),
-      includeFavicon: z
-        .boolean()
-        .optional()
-        .describe("Whether to include favicon URLs in the results"),
-      startDate: z
-        .string()
-        .optional()
-        .describe("Start date for search results (format: YYYY-MM-DD)"),
-      endDate: z
-        .string()
-        .optional()
-        .describe("End date for search results (format: YYYY-MM-DD)"),
     }),
-    execute: async ({
-      query,
-      includeDomains: inputIncludeDomains,
-      excludeDomains: inputExcludeDomains,
-      searchDepth: inputSearchDepth,
-      includeImages: inputIncludeImages,
-      timeRange: inputTimeRange,
-      topic: inputTopic,
-      includeFavicon: inputIncludeFavicon,
-      startDate: inputStartDate,
-      endDate: inputEndDate,
-    }) => {
+    execute: async ({ query }) => {
       const effectiveApiKey = apiKey || process.env.TAVILY_API_KEY;
 
       if (!effectiveApiKey) {
@@ -118,39 +69,23 @@ export const tavilySearch = ({
 
       const requestBody: Record<string, any> = {
         query,
-        search_depth: inputSearchDepth ?? searchDepth,
-        topic: inputTopic ?? topic,
+        search_depth: searchDepth,
+        topic: topic,
         max_results: maxResults,
-        include_images: inputIncludeImages ?? includeImages,
+        include_images: includeImages,
         include_answer: includeAnswer,
       };
 
-      // Add agent-controllable parameters if provided
-      if (inputIncludeDomains && inputIncludeDomains.length > 0)
-        requestBody.include_domains = inputIncludeDomains;
-      else if (includeDomains && includeDomains.length > 0)
+      // Add optional parameters from initialization
+      if (includeDomains && includeDomains.length > 0)
         requestBody.include_domains = includeDomains;
-      
-      if (inputExcludeDomains && inputExcludeDomains.length > 0)
-        requestBody.exclude_domains = inputExcludeDomains;
-      else if (excludeDomains && excludeDomains.length > 0)
+      if (excludeDomains && excludeDomains.length > 0)
         requestBody.exclude_domains = excludeDomains;
-      
-      if (inputTimeRange) requestBody.time_range = inputTimeRange;
-      else if (timeRange) requestBody.time_range = timeRange;
-      
-      if (inputStartDate) requestBody.start_date = inputStartDate;
-      else if (startDate) requestBody.start_date = startDate;
-      
-      if (inputEndDate) requestBody.end_date = inputEndDate;
-      else if (endDate) requestBody.end_date = endDate;
-      
-      if (inputIncludeFavicon !== undefined)
-        requestBody.include_favicon = inputIncludeFavicon;
-      else if (includeFavicon !== undefined)
+      if (timeRange) requestBody.time_range = timeRange;
+      if (startDate) requestBody.start_date = startDate;
+      if (endDate) requestBody.end_date = endDate;
+      if (includeFavicon !== undefined)
         requestBody.include_favicon = includeFavicon;
-
-      // Add developer-only parameters from closure
       if (days !== undefined) requestBody.days = days;
       if (includeImageDescriptions !== undefined)
         requestBody.include_image_descriptions = includeImageDescriptions;
