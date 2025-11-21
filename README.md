@@ -198,14 +198,13 @@ const result = await generateText({
 2. Install dependencies:
 
 ```bash
-pnpm install
+npm install
 ```
 
 3. Create a `.env` file:
 
 ```bash
 TAVILY_API_KEY=tvly-your-api-key
-VERCEL_AI_GATEWAY_URL=your-gateway-url
 ```
 
 ## API Reference
