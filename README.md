@@ -1,6 +1,6 @@
 # Tavily AI SDK Tools
 
-AI SDK tools for Tavily - the web access layer for the internet of agents.AI-optimized web search, extraction, crawling, and mapping platform.
+AI SDK tools for Tavily, built for Vercel's AI SDK v5.
 
 ## Features
 
