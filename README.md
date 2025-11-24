@@ -54,23 +54,29 @@ const result = await generateText({
 });
 ```
 
-**Options:**
+**Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
 - `searchDepth?: "basic" | "advanced"` - Search depth (default: "basic")
 - `topic?: "general" | "news" | "finance"` - Search category (default: "general")
 - `includeImages?: boolean` - Include images in results (default: false)
 - `includeAnswer?: boolean` - Include AI-generated answer (default: false)
 - `maxResults?: number` - Maximum results to return (default: 5)
-
-**Input Parameters:**
-All tool options can be overridden per call, plus:
-- `days?: number` - Days back to search (for news/finance)
-- `includeImageDescriptions?: boolean` - Include AI image descriptions
-- `includeRawContent?: "markdown" | "text"` - Include raw content
-- `includeDomains?: string[]` - Domains to include
-- `excludeDomains?: string[]` - Domains to exclude
-- `timeRange?: "year" | "month" | "week" | "day"` - Time range filter
-- `country?: string` - Country code for localized search
+- `includeImageDescriptions?: boolean` - Include AI-generated image descriptions
+- `includeRawContent?: false | "markdown" | "text"` - Include raw content in specified format
+- `includeDomains?: string[]` - List of domains to include in search
+- `excludeDomains?: string[]` - List of domains to exclude from search
+- `maxTokens?: number` - Maximum number of tokens in response
+- `timeRange?: "year" | "month" | "week" | "day" | "y" | "m" | "w" | "d"` - Time range for results
+- `chunksPerSource?: number` - Number of content chunks per source
+- `country?: string` - Country code for localized results
+- `startDate?: string` - Start date for results (YYYY-MM-DD format)
+- `endDate?: string` - End date for results (YYYY-MM-DD format)
+- `days?: number` - Number of days back to search (for news/finance topics)
+- `autoParameters?: boolean` - Enable automatic parameter optimization
+- `timeout?: number` - Request timeout in milliseconds
+- `includeFavicon?: boolean` - Include favicon URLs in results
+- `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
+- `apiBaseURL?: string` - Custom API base URL
 
 ### Tavily Extract
 
@@ -89,14 +95,19 @@ const result = await generateText({
 });
 ```
 
-**Options:**
+**Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
-
-**Input Parameters:**
-- `urls: string[]` - Array of URLs to extract content from
-- `includeImages?: boolean` - Include images (default: false)
+- `includeImages?: boolean` - Include images in extracted content (default: false)
 - `extractDepth?: "basic" | "advanced"` - Extraction depth (default: "basic")
 - `format?: "markdown" | "text"` - Output format (default: "markdown")
+- `timeout?: number` - Request timeout in milliseconds
+- `includeFavicon?: boolean` - Include favicon URLs in results
+- `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
+- `apiBaseURL?: string` - Custom API base URL
+
+**Input Parameters (for AI agent):**
+- `urls: string[]` - Array of URLs to extract content from (required)
+- `extractDepth?: "basic" | "advanced"` - Override extraction depth per call
 
 ### Tavily Crawl
 
@@ -115,23 +126,31 @@ const result = await generateText({
 });
 ```
 
-**Options:**
+**Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
-
-**Input Parameters:**
-- `url: string` - Base URL to start crawling from
 - `maxDepth?: number` - Maximum crawl depth (1-5, default: 1)
-- `maxBreadth?: number` - Max pages per depth level (1-100, default: 20)
+- `maxBreadth?: number` - Maximum pages per depth level (1-100, default: 20)
 - `limit?: number` - Maximum total pages to crawl (default: 50)
 - `extractDepth?: "basic" | "advanced"` - Content extraction depth
-- `instructions?: string` - Optional crawling instructions
-- `selectPaths?: string[]` - Path patterns to include
+- `instructions?: string` - Natural language crawling instructions
+- `selectPaths?: string[]` - Path patterns to include (e.g., `["/blog/*"]`)
 - `selectDomains?: string[]` - Domains to include
-- `excludePaths?: string[]` - Path patterns to exclude
+- `excludePaths?: string[]` - Path patterns to exclude (e.g., `["/admin/*"]`)
 - `excludeDomains?: string[]` - Domains to exclude
-- `allowExternal?: boolean` - Allow external domain crawling
-- `includeImages?: boolean` - Include images in content
-- `format?: "markdown" | "text"` - Output format
+- `allowExternal?: boolean` - Allow crawling external domains (default: false)
+- `includeImages?: boolean` - Include images in extracted content
+- `format?: "markdown" | "text"` - Output format (default: "markdown")
+- `timeout?: number` - Request timeout in milliseconds
+- `includeFavicon?: boolean` - Include favicon URLs in results
+- `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
+- `apiBaseURL?: string` - Custom API base URL
+
+**Input Parameters (for AI agent):**
+- `url: string` - Base URL to start crawling from (required)
+- `maxDepth?: number` - Override maximum crawl depth per call
+- `extractDepth?: "basic" | "advanced"` - Override extraction depth per call
+- `instructions?: string` - Override or specify crawling instructions per call
+- `allowExternal?: boolean` - Override external domain crawling setting per call
 
 ### Tavily Map
 
@@ -150,20 +169,27 @@ const result = await generateText({
 });
 ```
 
-**Options:**
+**Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
-
-**Input Parameters:**
-- `url: string` - Base URL to start mapping from
 - `maxDepth?: number` - Maximum mapping depth (1-5, default: 1)
-- `maxBreadth?: number` - Max pages per depth level (1-100, default: 20)
+- `maxBreadth?: number` - Maximum pages per depth level (1-100, default: 20)
 - `limit?: number` - Maximum total pages to map (default: 50)
-- `instructions?: string` - Optional mapping instructions
-- `selectPaths?: string[]` - Path patterns to include
+- `instructions?: string` - Natural language mapping instructions
+- `selectPaths?: string[]` - Path patterns to include (e.g., `["/docs/*"]`)
 - `selectDomains?: string[]` - Domains to include
-- `excludePaths?: string[]` - Path patterns to exclude
+- `excludePaths?: string[]` - Path patterns to exclude (e.g., `["/api/*"]`)
 - `excludeDomains?: string[]` - Domains to exclude
-- `allowExternal?: boolean` - Allow external domain mapping
+- `allowExternal?: boolean` - Allow mapping external domains (default: false)
+- `timeout?: number` - Request timeout in milliseconds
+- `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
+- `apiBaseURL?: string` - Custom API base URL
+
+**Input Parameters (for AI agent):**
+- `url: string` - Base URL to start mapping from (required)
+- `maxDepth?: number` - Override maximum mapping depth per call
+- `instructions?: string` - Override or specify mapping instructions per call
+- `allowExternal?: boolean` - Override external domain mapping setting per call
+
 
 ## Using Multiple Tools Together
 
