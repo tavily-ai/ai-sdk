@@ -17,7 +17,6 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
-    "test": "tsx --env-file=.env src/test.ts",
     "prepublishOnly": "pnpm build"
   },
   "keywords": [
@@ -27,7 +26,6 @@
     "tavily",
     "search",
     "web-search",
-    "web-scraping",
     "crawl",
     "extract"
   ],
