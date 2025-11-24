@@ -31,6 +31,10 @@
   ],
   "author": "Tavily",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tavily-ai/ai-sdk"
+  },
   "packageManager": "pnpm@10.8.0",
   "devDependencies": {
     "@ai-sdk/openai": "^2.0.71",
