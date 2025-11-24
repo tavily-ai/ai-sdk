@@ -25,30 +25,10 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
       .describe(
         "The depth of the search - 'basic' for quick results, 'advanced' for comprehensive search"
       ),
-    includeImages: z
-      .boolean()
-      .optional()
-      .describe("Whether to include relevant images in the results"),
     timeRange: z
       .enum(["year", "month", "week", "day", "y", "m", "w", "d"])
       .optional()
-      .describe("Time range for search results"),
-    includeDomains: z
-      .array(z.string())
-      .optional()
-      .describe("List of domains to specifically include in the search"),
-    excludeDomains: z
-      .array(z.string())
-      .optional()
-      .describe("List of domains to exclude from the search"),
-    startDate: z
-      .string()
-      .optional()
-      .describe("Start date for search results (format: YYYY-MM-DD)"),
-    endDate: z
-      .string()
-      .optional()
-      .describe("End date for search results (format: YYYY-MM-DD)"),
+      .describe("Time range for search results")
   });
 
   return tool({
@@ -58,22 +38,12 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
     execute: async ({
       query,
       searchDepth: inputSearchDepth,
-      includeImages: inputIncludeImages,
       timeRange: inputTimeRange,
-      includeDomains: inputIncludeDomains,
-      excludeDomains: inputExcludeDomains,
-      startDate: inputStartDate,
-      endDate: inputEndDate,
     }: z.infer<typeof inputSchema>) => {
       return await client.search(query, {
         ...options,
         searchDepth: inputSearchDepth ?? options.searchDepth,
-        includeImages: inputIncludeImages ?? options.includeImages,
-        includeDomains: inputIncludeDomains ?? options.includeDomains,
-        excludeDomains: inputExcludeDomains ?? options.excludeDomains,
         timeRange: inputTimeRange ?? options.timeRange,
-        startDate: inputStartDate ?? options.startDate,
-        endDate: inputEndDate ?? options.endDate,
       });
     },
   });
