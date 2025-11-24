@@ -1,0 +1,79 @@
+# Source files (only publish built dist/)
+src/
+*.ts
+!*.d.ts
+
+# Tests
+test/
+tests/
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+__tests__/
+coverage/
+
+# Build configuration
+tsconfig.json
+tsconfig.*.json
+tsup.config.ts
+rollup.config.js
+webpack.config.js
+vite.config.ts
+
+# Development dependencies
+node_modules/
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lockb
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+azure-pipelines.yml
+
+# Documentation (development only)
+docs/
+CONTRIBUTING.md
+CHANGELOG.md
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Misc
+.npmignore
+.eslintrc*
+.prettierrc*
+.editorconfig
+*.tsbuildinfo
+.cache/
+tmp/
+temp/
