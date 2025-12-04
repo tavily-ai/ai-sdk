@@ -39,7 +39,7 @@ Search the web for real-time, AI-optimized information:
 
 ```typescript
 import { tavilySearch } from "@tavily/ai-sdk";
-import { generateText, gateway } from "ai";
+import { generateText, gateway, stepCountIs } from "ai";
 
 const result = await generateText({
   model: gateway("openai/gpt-5-mini"),
@@ -51,6 +51,7 @@ const result = await generateText({
       maxResults: 5,
     }),
   },
+  stopWhen: stepCountIs(3),
 });
 ```
 
@@ -84,7 +85,7 @@ Extract clean, structured content from URLs:
 
 ```typescript
 import { tavilyExtract } from "@tavily/ai-sdk";
-import { generateText, gateway } from "ai";
+import { generateText, gateway, stepCountIs } from "ai";
 
 const result = await generateText({
   model: gateway("openai/gpt-5-mini"),
@@ -92,6 +93,7 @@ const result = await generateText({
   tools: {
     tavilyExtract: tavilyExtract(),
   },
+  stopWhen: stepCountIs(3),
 });
 ```
 
@@ -115,7 +117,7 @@ Crawl websites to discover and extract content from multiple pages:
 
 ```typescript
 import { tavilyCrawl } from "@tavily/ai-sdk";
-import { generateText, gateway } from "ai";
+import { generateText, gateway, stepCountIs } from "ai";
 
 const result = await generateText({
   model: gateway("openai/gpt-5-mini"),
@@ -123,6 +125,7 @@ const result = await generateText({
   tools: {
     tavilyCrawl: tavilyCrawl(),
   },
+  stopWhen: stepCountIs(3),
 });
 ```
 
@@ -158,7 +161,7 @@ Map website structure to understand site architecture:
 
 ```typescript
 import { tavilyMap } from "@tavily/ai-sdk";
-import { generateText, gateway } from "ai";
+import { generateText, gateway, stepCountIs } from "ai";
 
 const result = await generateText({
   model: gateway("openai/gpt-5-mini"),
@@ -166,6 +169,7 @@ const result = await generateText({
   tools: {
     tavilyMap: tavilyMap(),
   },
+  stopWhen: stepCountIs(3),
 });
 ```
 
@@ -202,7 +206,7 @@ import {
   tavilyCrawl, 
   tavilyMap 
 } from "@tavily/ai-sdk";
-import { generateText, gateway } from "ai";
+import { generateText, gateway, stepCountIs } from "ai";
 
 const result = await generateText({
   model: gateway("openai/gpt-5-mini"),
@@ -213,6 +217,7 @@ const result = await generateText({
     tavilyCrawl: tavilyCrawl(),
     tavilyMap: tavilyMap(),
   },
+  stopWhen: stepCountIs(3),
 });
 ```
 
