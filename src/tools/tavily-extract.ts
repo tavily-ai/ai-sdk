@@ -1,12 +1,15 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { tavily } from "@tavily/core";
-import type { 
+import type {
   TavilyExtractOptions as CoreExtractOptions,
   TavilyClientOptions
 } from "@tavily/core";
 
-type TavilyExtractOptions = TavilyClientOptions & Partial<CoreExtractOptions>;
+type TavilyExtractOptions = TavilyClientOptions &
+  Partial<CoreExtractOptions> & {
+    include_usage?: boolean;
+  };
 
 /**
  * Tavily Extract tool for AI SDK
@@ -25,6 +28,12 @@ export const tavilyExtract = (options: TavilyExtractOptions = {}) => {
       .describe(
         "Extraction depth - 'basic' for main content, 'advanced' for comprehensive extraction (default: 'basic')"
       ),
+    include_usage: z
+      .boolean()
+      .optional()
+      .describe(
+        "When true, Tavily will return a `usage` field containing the credits billed for this request (default: false)"
+      ),
   });
 
   return tool({
@@ -34,10 +43,12 @@ export const tavilyExtract = (options: TavilyExtractOptions = {}) => {
     execute: async ({
       urls,
       extractDepth: inputExtractDepth,
+      include_usage: inputIncludeUsage,
     }: z.infer<typeof inputSchema>) => {
       return await client.extract(urls, {
         ...options,
         extractDepth: inputExtractDepth ?? options.extractDepth,
+        include_usage: inputIncludeUsage ?? options.include_usage,
       });
     },
   });

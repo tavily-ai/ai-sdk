@@ -1,12 +1,15 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { tavily } from "@tavily/core";
-import type { 
+import type {
   TavilyCrawlOptions as CoreCrawlOptions,
   TavilyClientOptions
 } from "@tavily/core";
 
-type TavilyCrawlOptions = TavilyClientOptions & Partial<CoreCrawlOptions>;
+type TavilyCrawlOptions = TavilyClientOptions &
+  Partial<CoreCrawlOptions> & {
+    include_usage?: boolean;
+  };
 
 /**
  * Tavily Crawl tool for AI SDK
@@ -41,6 +44,12 @@ export const tavilyCrawl = (options: TavilyCrawlOptions = {}) => {
       .boolean()
       .optional()
       .describe("Whether to allow crawling external domains (default: false)"),
+    include_usage: z
+      .boolean()
+      .optional()
+      .describe(
+        "When true, Tavily will return a `usage` field containing the credits billed for this request (default: false)"
+      ),
   });
 
   return tool({
@@ -53,6 +62,7 @@ export const tavilyCrawl = (options: TavilyCrawlOptions = {}) => {
       extractDepth: inputExtractDepth,
       instructions: inputInstructions,
       allowExternal: inputAllowExternal,
+      include_usage: inputIncludeUsage,
     }: z.infer<typeof inputSchema>) => {
       return await client.crawl(url, {
         ...options,
@@ -60,6 +70,7 @@ export const tavilyCrawl = (options: TavilyCrawlOptions = {}) => {
         extractDepth: inputExtractDepth ?? options.extractDepth,
         instructions: inputInstructions ?? options.instructions,
         allowExternal: inputAllowExternal ?? options.allowExternal,
+        include_usage: inputIncludeUsage ?? options.include_usage,
       });
     },
   });

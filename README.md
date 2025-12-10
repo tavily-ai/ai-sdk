@@ -31,6 +31,16 @@ export TAVILY_API_KEY=tvly-your-api-key
 
 Or pass it directly to the tool configuration.
 
+## Credit Usage Metadata
+
+All Tavily tools now accept an optional `include_usage` boolean parameter that exposes the credits billed for each request as a `usage` field in the response.
+
+- Type: boolean
+- Optional: Yes (defaults to `false`)
+- Response field: `usage` (integer) is only returned when `include_usage` is `true` and may be `0` if the minimum thresholds are not met
+- See the [Credits & Pricing documentation](https://github.com/tavily-ai/new-docs/blob/main/docs/credits-pricing.md) for details
+- When using OpenAI or Anthropic models through the Vercel AI SDK, set `include_usage: true` in your Tavily tool configuration to surface usage metadata alongside model responses
+
 ## Usage
 
 ### Tavily Search
@@ -76,6 +86,7 @@ const result = await generateText({
 - `autoParameters?: boolean` - Enable automatic parameter optimization
 - `timeout?: number` - Request timeout in milliseconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
+- `include_usage?: boolean` - Return the `usage` field detailing Tavily credit consumption (default: false)
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 
@@ -104,6 +115,7 @@ const result = await generateText({
 - `format?: "markdown" | "text"` - Output format (default: "markdown")
 - `timeout?: number` - Request timeout in milliseconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
+- `include_usage?: boolean` - Return the `usage` field detailing Tavily credit consumption (default: false)
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 
@@ -145,6 +157,7 @@ const result = await generateText({
 - `format?: "markdown" | "text"` - Output format (default: "markdown")
 - `timeout?: number` - Request timeout in milliseconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
+- `include_usage?: boolean` - Return the `usage` field detailing Tavily credit consumption (default: false)
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 
@@ -185,6 +198,7 @@ const result = await generateText({
 - `excludeDomains?: string[]` - Domains to exclude
 - `allowExternal?: boolean` - Allow mapping external domains (default: false)
 - `timeout?: number` - Request timeout in milliseconds
+- `include_usage?: boolean` - Return the `usage` field detailing Tavily credit consumption (default: false)
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 

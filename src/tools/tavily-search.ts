@@ -1,12 +1,15 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { tavily } from "@tavily/core";
-import type { 
+import type {
   TavilySearchOptions as CoreSearchOptions,
   TavilyClientOptions
 } from "@tavily/core";
 
-type TavilySearchOptions = TavilyClientOptions & Partial<CoreSearchOptions>;
+type TavilySearchOptions = TavilyClientOptions &
+  Partial<CoreSearchOptions> & {
+    include_usage?: boolean;
+  };
 
 /**
  * Tavily Search tool for AI SDK
@@ -28,7 +31,13 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
     timeRange: z
       .enum(["year", "month", "week", "day", "y", "m", "w", "d"])
       .optional()
-      .describe("Time range for search results")
+      .describe("Time range for search results"),
+    include_usage: z
+      .boolean()
+      .optional()
+      .describe(
+        "When true, Tavily will return a `usage` field containing the credits billed for this request (default: false)"
+      ),
   });
 
   return tool({
@@ -39,11 +48,13 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
       query,
       searchDepth: inputSearchDepth,
       timeRange: inputTimeRange,
+      include_usage: inputIncludeUsage,
     }: z.infer<typeof inputSchema>) => {
       return await client.search(query, {
         ...options,
         searchDepth: inputSearchDepth ?? options.searchDepth,
         timeRange: inputTimeRange ?? options.timeRange,
+        include_usage: inputIncludeUsage ?? options.include_usage,
       });
     },
   });
