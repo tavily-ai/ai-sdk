@@ -1,12 +1,15 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { tavily } from "@tavily/core";
-import type { 
+import type {
   TavilyMapOptions as CoreMapOptions,
   TavilyClientOptions
 } from "@tavily/core";
 
-type TavilyMapOptions = TavilyClientOptions & Partial<CoreMapOptions>;
+type TavilyMapOptions = TavilyClientOptions &
+  Partial<CoreMapOptions> & {
+    include_usage?: boolean;
+  };
 
 /**
  * Tavily Map tool for AI SDK
@@ -37,6 +40,12 @@ export const tavilyMap = (options: TavilyMapOptions = {}) => {
       .boolean()
       .optional()
       .describe("Whether to allow mapping external domains (default: false)"),
+    include_usage: z
+      .boolean()
+      .optional()
+      .describe(
+        "When true, Tavily will return a `usage` field containing the credits billed for this request (default: false)"
+      ),
   });
 
   return tool({
@@ -48,12 +57,14 @@ export const tavilyMap = (options: TavilyMapOptions = {}) => {
       maxDepth: inputMaxDepth,
       instructions: inputInstructions,
       allowExternal: inputAllowExternal,
+      include_usage: inputIncludeUsage,
     }: z.infer<typeof inputSchema>) => {
       return await client.map(url, {
         ...options,
         maxDepth: inputMaxDepth ?? options.maxDepth,
         instructions: inputInstructions ?? options.instructions,
         allowExternal: inputAllowExternal ?? options.allowExternal,
+        include_usage: inputIncludeUsage ?? options.include_usage,
       });
     },
   });
