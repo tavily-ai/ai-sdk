@@ -76,6 +76,7 @@ const result = await generateText({
 - `autoParameters?: boolean` - Enable automatic parameter optimization
 - `timeout?: number` - Request timeout in milliseconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
+- `includeUsage?: boolean` - Whether to include credit usage information in the response.
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 
@@ -104,6 +105,7 @@ const result = await generateText({
 - `format?: "markdown" | "text"` - Output format (default: "markdown")
 - `timeout?: number` - Request timeout in milliseconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
+- `includeUsage?: boolean` - Whether to include credit usage information in the response. NOTE:The value may be 0 if the total successful URL extractions has not yet reached 5 calls. See our [Credits & Pricing documentation]("https://docs.tavily.com/documentation/api-credits") for details.
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 
@@ -145,6 +147,7 @@ const result = await generateText({
 - `format?: "markdown" | "text"` - Output format (default: "markdown")
 - `timeout?: number` - Request timeout in milliseconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
+- `includeUsage?: boolean` - Whether to include credit usage information in the response. NOTE:The value may be 0 if the total use of /extract and /map have not yet reached minimum requirements. See our [Credits & Pricing documentation]("https://docs.tavily.com/documentation/api-credits") for details.
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 
@@ -187,6 +190,7 @@ const result = await generateText({
 - `timeout?: number` - Request timeout in milliseconds
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
+- `includeUsage?: boolean` - Whether to include credit usage information in the response.NOTE:The value may be 0 if the total successful pages mapped has not yet reached 10 calls. See our [Credits & Pricing documentation]("https://docs.tavily.com/documentation/api-credits") for details.
 
 **Input Parameters (for AI agent):**
 - `url: string` - Base URL to start mapping from (required)
