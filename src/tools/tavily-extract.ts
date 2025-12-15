@@ -25,6 +25,10 @@ export const tavilyExtract = (options: TavilyExtractOptions = {}) => {
       .describe(
         "Extraction depth - 'basic' for main content, 'advanced' for comprehensive extraction (default: 'basic')"
       ),
+    query: z
+      .string()
+      .optional()
+      .describe("User intent query for reranking extracted content chunks"),
   });
 
   return tool({
@@ -34,10 +38,12 @@ export const tavilyExtract = (options: TavilyExtractOptions = {}) => {
     execute: async ({
       urls,
       extractDepth: inputExtractDepth,
+      query: inputQuery,
     }: z.infer<typeof inputSchema>) => {
       return await client.extract(urls, {
         ...options,
         extractDepth: inputExtractDepth ?? options.extractDepth,
+        query: inputQuery ?? options.query,
       });
     },
   });
