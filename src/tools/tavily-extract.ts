@@ -29,15 +29,6 @@ export const tavilyExtract = (options: TavilyExtractOptions = {}) => {
       .string()
       .optional()
       .describe("User intent query for reranking extracted content chunks"),
-    chunksPerSource: z
-      .number()
-      .int()
-      .min(1)
-      .max(5)
-      .optional()
-      .describe(
-        "Number of top-ranked content chunks to return per source when using query (default: 3, range: 1-5)"
-      ),
   });
 
   return tool({
@@ -48,13 +39,11 @@ export const tavilyExtract = (options: TavilyExtractOptions = {}) => {
       urls,
       extractDepth: inputExtractDepth,
       query: inputQuery,
-      chunksPerSource: inputChunksPerSource,
     }: z.infer<typeof inputSchema>) => {
       return await client.extract(urls, {
         ...options,
         extractDepth: inputExtractDepth ?? options.extractDepth,
         query: inputQuery ?? options.query,
-        chunksPerSource: inputChunksPerSource ?? options.chunksPerSource,
       });
     },
   });
