@@ -13,7 +13,7 @@ type TavilyCrawlOptions = TavilyClientOptions & Partial<CoreCrawlOptions>;
  * Crawls a website starting from a base URL to discover and extract content from multiple pages
  */
 export const tavilyCrawl = (options: TavilyCrawlOptions = {}) => {
-  const client = tavily(options);
+  const client = tavily({ ...options, clientSource: "ai-sdk" } as TavilyClientOptions);
   
   const inputSchema = z.object({
     url: z

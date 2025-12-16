@@ -13,7 +13,7 @@ type TavilyExtractOptions = TavilyClientOptions & Partial<CoreExtractOptions>;
  * Extracts structured content from specified URLs with AI-optimized parsing
  */
 export const tavilyExtract = (options: TavilyExtractOptions = {}) => {
-  const client = tavily(options);
+  const client = tavily({ ...options, clientSource: "ai-sdk" } as TavilyClientOptions);
   
   const inputSchema = z.object({
     urls: z

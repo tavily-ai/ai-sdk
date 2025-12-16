@@ -13,7 +13,7 @@ type TavilySearchOptions = TavilyClientOptions & Partial<CoreSearchOptions>;
  * Performs web searches optimized for AI applications with real-time, contextual information
  */
 export const tavilySearch = (options: TavilySearchOptions = {}) => {
-  const client = tavily(options);
+  const client = tavily({ ...options, clientSource: "ai-sdk" } as TavilyClientOptions);
   
   const inputSchema = z.object({
     query: z
