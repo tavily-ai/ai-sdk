@@ -41,10 +41,6 @@ export const tavilyCrawl = (options: TavilyCrawlOptions = {}) => {
       .boolean()
       .optional()
       .describe("Whether to allow crawling external domains (default: false)"),
-    query: z
-      .string()
-      .optional()
-      .describe("User intent query for reranking extracted content chunks"),
   });
 
   return tool({
@@ -57,7 +53,6 @@ export const tavilyCrawl = (options: TavilyCrawlOptions = {}) => {
       extractDepth: inputExtractDepth,
       instructions: inputInstructions,
       allowExternal: inputAllowExternal,
-      query: inputQuery,
     }: z.infer<typeof inputSchema>) => {
       return await client.crawl(url, {
         ...options,
@@ -65,7 +60,7 @@ export const tavilyCrawl = (options: TavilyCrawlOptions = {}) => {
         extractDepth: inputExtractDepth ?? options.extractDepth,
         instructions: inputInstructions ?? options.instructions,
         allowExternal: inputAllowExternal ?? options.allowExternal,
-        query: inputQuery ?? options.query,
+        chunksPerSource: 3,
       });
     },
   });
