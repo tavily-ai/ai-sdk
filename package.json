@@ -1,6 +1,6 @@
 {
   "name": "@tavily/ai-sdk",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Tavily AI SDK tools - Search, Extract, Crawl, and Map",
   "type": "module",
   "main": "./dist/index.js",
