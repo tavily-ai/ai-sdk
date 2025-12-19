@@ -13,7 +13,7 @@ type TavilyMapOptions = TavilyClientOptions & Partial<CoreMapOptions>;
  * Maps the structure of a website to discover and organize its pages and hierarchy
  */
 export const tavilyMap = (options: TavilyMapOptions = {}) => {
-  const client = tavily(options);
+  const client = tavily({ ...options, clientSource: "ai-sdk" } as TavilyClientOptions);
   
   const inputSchema = z.object({
     url: z
