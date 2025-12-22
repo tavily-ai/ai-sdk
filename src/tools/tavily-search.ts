@@ -20,10 +20,10 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
       .string()
       .describe("The search query to look up on the web"),
     searchDepth: z
-      .enum(["basic", "advanced"])
+      .enum(["basic", "advanced", "fast", "ultra-fast"])
       .optional()
       .describe(
-        "The depth of the search - 'basic' for quick results, 'advanced' for comprehensive search"
+        "The depth of the search - 'basic' for quick results, 'advanced' for comprehensive search, 'fast' for low latency with high relevance (BETA), 'ultra-fast' prioritizes latency above all (BETA)"
       ),
     timeRange: z
       .enum(["year", "month", "week", "day", "y", "m", "w", "d"])
@@ -42,7 +42,7 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
     }: z.infer<typeof inputSchema>) => {
       return await client.search(query, {
         ...options,
-        searchDepth: inputSearchDepth ?? options.searchDepth,
+        searchDepth: (inputSearchDepth ?? options.searchDepth) as "basic" | "advanced" | undefined,
         timeRange: inputTimeRange ?? options.timeRange,
       });
     },
