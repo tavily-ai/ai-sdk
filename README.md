@@ -1,6 +1,6 @@
 # @tavily/ai-sdk
 
-AI SDK tools for Tavily, built for Vercel's AI SDK v5.
+AI SDK tools for Tavily, compatible with Vercel's AI SDK v5 and v6.
 
 ## Features
 
