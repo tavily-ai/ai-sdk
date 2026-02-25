@@ -77,6 +77,7 @@ const result = await generateText({
 - `timeout?: number` - Request timeout in milliseconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
 - `includeUsage?: boolean` - Whether to include credit usage information in the response.
+- `exactMatch?: boolean` - Only return results containing the exact phrase(s) inside quotes in the query
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 
