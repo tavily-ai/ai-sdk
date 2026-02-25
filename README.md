@@ -68,6 +68,7 @@ const result = await generateText({
 - `excludeDomains?: string[]` - List of domains to exclude from search
 - `maxTokens?: number` - Maximum number of tokens in response
 - `timeRange?: "year" | "month" | "week" | "day" | "y" | "m" | "w" | "d"` - Time range for results
+- `exactMatch?: boolean` - If true, only return results containing the exact phrase(s) in quotes from the query
 - `chunksPerSource?: number` - Number of content chunks per source
 - `country?: string` - Country code for localized results
 - `startDate?: string` - Start date for results (YYYY-MM-DD format)
