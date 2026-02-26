@@ -29,10 +29,6 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
       .enum(["year", "month", "week", "day", "y", "m", "w", "d"])
       .optional()
       .describe("Time range for search results"),
-    exactMatch: z
-      .boolean()
-      .optional()
-      .describe("Only return results containing the exact phrase(s) inside quotes in the query. Use when searching for a specific name or phrase that must appear verbatim in source content.")
   });
 
   return tool({
@@ -43,13 +39,11 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
       query,
       searchDepth: inputSearchDepth,
       timeRange: inputTimeRange,
-      exactMatch: inputExactMatch,
     }: z.infer<typeof inputSchema>) => {
       return await client.search(query, {
         ...options,
         searchDepth: (inputSearchDepth ?? options.searchDepth) as "basic" | "advanced" | undefined,
         timeRange: inputTimeRange ?? options.timeRange,
-        exactMatch: inputExactMatch ?? options.exactMatch,
       });
     },
   });
