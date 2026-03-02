@@ -28,7 +28,7 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
     timeRange: z
       .enum(["year", "month", "week", "day", "y", "m", "w", "d"])
       .optional()
-      .describe("Time range for search results")
+      .describe("Time range for search results"),
   });
 
   return tool({
