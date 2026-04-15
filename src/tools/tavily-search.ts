@@ -49,7 +49,7 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
         ...options,
         searchDepth: (inputSearchDepth ?? options.searchDepth) as "basic" | "advanced" | undefined,
         timeRange: inputTimeRange ?? options.timeRange,
-        ...(inputExactMatch !== undefined && { exact_match: inputExactMatch }),
+        ...(inputExactMatch !== undefined && { exactMatch: inputExactMatch }),
       });
     },
   });
