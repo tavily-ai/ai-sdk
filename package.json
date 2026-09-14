@@ -41,7 +41,7 @@
   },
   "packageManager": "pnpm@10.8.0",
   "devDependencies": {
-    "@ai-sdk/openai": "^2.0.71",
+    "@ai-sdk/openai": "^3.0.112",
     "@types/node": "^24.10.1",
     "dotenv": "^17.2.3",
     "tsup": "^8.5.0",
