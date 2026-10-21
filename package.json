@@ -17,6 +17,7 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm build"
   },
   "keywords": [
@@ -41,18 +42,20 @@
   },
   "packageManager": "pnpm@10.8.0",
   "devDependencies": {
-    "@ai-sdk/openai": "^3.0.112",
+    "@ai-sdk/openai": "^4.0.99",
     "@types/node": "^24.10.1",
+    "ai": "^7.0.0",
     "dotenv": "^17.2.3",
     "tsup": "^8.5.0",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "zod": "^4.1.8"
   },
   "dependencies": {
     "@tavily/core": "^0.7.2"
   },
   "peerDependencies": {
-    "ai": "^5.0.0 || ^6.0.0",
-    "zod": "^4.0.0"
+    "ai": "^5.0.0 || ^6.0.0 || ^7.0.0",
+    "zod": "^4.1.8"
   }
 }
