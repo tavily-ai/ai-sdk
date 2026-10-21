@@ -1,6 +1,6 @@
 # @tavily/ai-sdk
 
-AI SDK tools for Tavily, compatible with Vercel's AI SDK v5 and v6.
+AI SDK tools for Tavily, compatible with Vercel's AI SDK v5, v6 and v7.
 
 ## Features
 
@@ -8,6 +8,18 @@ AI SDK tools for Tavily, compatible with Vercel's AI SDK v5 and v6.
 - **Extract**: Clean, structured content extraction from URLs
 - **Crawl**: Intelligent website crawling at scale
 - **Map**: Website structure discovery and mapping
+
+## Compatibility
+
+| AI SDK version | Supported | Notes |
+| --- | --- | --- |
+| v7.x | ✅ | Requires Node.js 22 or later |
+| v6.x | ✅ | |
+| v5.x | ✅ | |
+
+This package requires `zod` v4 (`^4.1.8`), which is the minimum version required by AI SDK v5, v6 and v7.
+
+When using AI SDK v7, make sure to use provider packages built for v7 (e.g. `@ai-sdk/openai` v4).
 
 ## Installation
 
