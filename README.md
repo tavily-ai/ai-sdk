@@ -154,7 +154,7 @@ const result = await generateText({
 - `selectDomains?: string[]` - Domains to include
 - `excludePaths?: string[]` - Path patterns to exclude (e.g., `["/admin/*"]`)
 - `excludeDomains?: string[]` - Domains to exclude
-- `allowExternal?: boolean` - Allow crawling external domains (default: false)
+- `allowExternal?: boolean` - Allow crawling external domains (default: true). Pass `allowExternal: false` to confine crawling to the root domain.
 - `includeImages?: boolean` - Include images in extracted content
 - `format?: "markdown" | "text"` - Output format (default: "markdown")
 - `timeout?: number` - Request timeout in seconds
@@ -200,7 +200,7 @@ const result = await generateText({
 - `selectDomains?: string[]` - Domains to include
 - `excludePaths?: string[]` - Path patterns to exclude (e.g., `["/api/*"]`)
 - `excludeDomains?: string[]` - Domains to exclude
-- `allowExternal?: boolean` - Allow mapping external domains (default: false)
+- `allowExternal?: boolean` - Allow mapping external domains (default: true). Pass `allowExternal: false` to confine mapping to the root domain.
 - `timeout?: number` - Request timeout in seconds
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
