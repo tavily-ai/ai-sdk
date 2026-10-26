@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@tavily/core':
-        specifier: ^0.7.2
-        version: 0.7.2
+        specifier: ^0.7.14
+        version: 0.7.14
       ai:
         specifier: ^5.0.0 || ^6.0.0
         version: 6.0.280(zod@4.1.12)
@@ -370,8 +370,8 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
-  '@tavily/core@0.7.2':
-    resolution: {integrity: sha512-N9xfw9miPD1jyVKYTMWV1hQvWPNjATT9Hffr6tv7VMHzwOPOeBwfX/R25ZE2F7meTyq6xSeGxclWnLVH2xHqFA==}
+  '@tavily/core@0.7.14':
+    resolution: {integrity: sha512-QB6EHpWjSbTnmIAIA0GU6COYQS8VfGcD8wokfXA9TTvrOzBCTtZZJnKw/JFN0qYpO97SJ4gwmlVlnsSg8DUFcw==}
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
@@ -1088,7 +1088,7 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@tavily/core@0.7.2':
+  '@tavily/core@0.7.14':
     dependencies:
       axios: 1.19.0
       https-proxy-agent: 7.0.6

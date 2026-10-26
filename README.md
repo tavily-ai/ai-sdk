@@ -8,6 +8,7 @@ AI SDK tools for Tavily, compatible with Vercel's AI SDK v5 and v6.
 - **Extract**: Clean, structured content extraction from URLs
 - **Crawl**: Intelligent website crawling at scale
 - **Map**: Website structure discovery and mapping
+- **Research**: Background research tasks with structured reports, file sources, citations, and status/result lookup
 
 ## Installation
 
@@ -21,7 +22,7 @@ yarn add @tavily/ai-sdk
 
 ## Prerequisites
 
-You need a Tavily API key to use these tools. Get one at [tavily.com](https://tavily.com).
+Map, Crawl and Research require a Tavily API key. Search and Extract also support the SDK's limited [keyless mode](https://docs.tavily.com/documentation/keyless) when no key is configured. Get a key at [tavily.com](https://tavily.com) for authenticated use.
 
 Set your API key as an environment variable:
 
@@ -57,11 +58,11 @@ const result = await generateText({
 
 **Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
-- `searchDepth?: "basic" | "advanced"` - Search depth (default: "basic")
+- `searchDepth?: "basic" | "advanced" | "fast" | "ultra-fast"` - Search depth (default: "basic")
 - `topic?: "general" | "news" | "finance"` - Search category (default: "general")
 - `includeImages?: boolean` - Include images in results (default: false)
 - `includeAnswer?: boolean` - Include AI-generated answer (default: false)
-- `maxResults?: number` - Maximum results to return (default: 5)
+- `maxResults?: number` - Maximum results to return (default: 10)
 - `includeImageDescriptions?: boolean` - Include AI-generated image descriptions
 - `includeRawContent?: false | "markdown" | "text"` - Include raw content in specified format
 - `includeDomains?: string[]` - List of domains to include in search
@@ -69,16 +70,24 @@ const result = await generateText({
 - `maxTokens?: number` - Maximum number of tokens in response
 - `timeRange?: "year" | "month" | "week" | "day" | "y" | "m" | "w" | "d"` - Time range for results
 - `chunksPerSource?: number` - Number of content chunks per source
-- `country?: string` - Country code for localized results
+- `country?: string` - Lowercase country name (for example, 'united states'), for general-topic results
 - `startDate?: string` - Start date for results (YYYY-MM-DD format)
 - `endDate?: string` - End date for results (YYYY-MM-DD format)
 - `days?: number` - Number of days back to search (for news/finance topics)
 - `autoParameters?: boolean` - Enable automatic parameter optimization
-- `timeout?: number` - Request timeout in milliseconds
+- `timeout?: number` - Request timeout in seconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
 - `includeUsage?: boolean` - Whether to include credit usage information in the response.
+- `includeDomainsMode?: "prefer" | "restrict"` - With `includeDomains`, boost those domains or return only them
+- `language?: string` / `filterByLanguage?: boolean` - Boost results in a language, or return only that language
+- `exactMatch?: boolean` - Require the quoted phrases in the query
+- `safeSearch?: boolean` - Filter unsafe content (not supported with fast/ultra-fast depth)
+- `includePublishedDate?: boolean` / `filterByPublishedDate?: boolean` - Include detected dates or filter to the date window (beta)
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
+- `clientName?: string` - Identity sent to Tavily (default: `"ai-sdk"`); `clientSource` is left to the SDK
+
+**Input Parameters (for AI agent):** `query` (required), `searchDepth`, `topic`, `maxResults`, `chunksPerSource` (1-3; basic, advanced and fast), `timeRange`, `startDate`, `endDate`, `country`, `includeDomains`, `excludeDomains`, `includeDomainsMode`, `language`, `filterByLanguage`, `safeSearch`, `exactMatch`, `autoParameters`, `includeAnswer`, `includeRawContent`, `includeImages`, `includeImageDescriptions`, `includeFavicon`, `includePublishedDate` (beta), `filterByPublishedDate` (beta), `includeUsage`. Values the agent leaves out fall back to the configuration above. Combinations the API rejects (for example `includeDomainsMode` without `includeDomains`, `safeSearch` with `fast`/`ultra-fast`) fail before a request is sent.
 
 ### Tavily Extract
 
@@ -103,15 +112,18 @@ const result = await generateText({
 - `includeImages?: boolean` - Include images in extracted content (default: false)
 - `extractDepth?: "basic" | "advanced"` - Extraction depth (default: "basic")
 - `format?: "markdown" | "text"` - Output format (default: "markdown")
-- `timeout?: number` - Request timeout in milliseconds
+- `timeout?: number` - Request timeout in seconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
 - `includeUsage?: boolean` - Whether to include credit usage information in the response. NOTE:The value may be 0 if the total successful URL extractions has not yet reached 5 calls. See our [Credits & Pricing documentation]("https://docs.tavily.com/documentation/api-credits") for details.
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 
 **Input Parameters (for AI agent):**
-- `urls: string[]` - Array of URLs to extract content from (required)
+- `urls: string[]` - 1-20 URLs to extract content from (required)
 - `extractDepth?: "basic" | "advanced"` - Override extraction depth per call
+- `query?: string` - Intent used to rerank content chunks
+- `chunksPerSource?: number` - Chunks per URL (1-5; requires `query`)
+- `format?: "markdown" | "text"`, `timeout?: number` (1-60 seconds), `includeImages?: boolean`, `includeFavicon?: boolean`, `includeUsage?: boolean`
 
 ### Tavily Crawl
 
@@ -134,7 +146,7 @@ const result = await generateText({
 **Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
 - `maxDepth?: number` - Maximum crawl depth (1-5, default: 1)
-- `maxBreadth?: number` - Maximum pages per depth level (1-100, default: 20)
+- `maxBreadth?: number` - Maximum links followed per page (1-500, default: 20)
 - `limit?: number` - Maximum total pages to crawl (default: 50)
 - `extractDepth?: "basic" | "advanced"` - Content extraction depth
 - `instructions?: string` - Natural language crawling instructions
@@ -142,10 +154,10 @@ const result = await generateText({
 - `selectDomains?: string[]` - Domains to include
 - `excludePaths?: string[]` - Path patterns to exclude (e.g., `["/admin/*"]`)
 - `excludeDomains?: string[]` - Domains to exclude
-- `allowExternal?: boolean` - Allow crawling external domains (default: false)
+- `allowExternal?: boolean` - Allow crawling external domains (default: true). Pass `allowExternal: false` to confine crawling to the root domain.
 - `includeImages?: boolean` - Include images in extracted content
 - `format?: "markdown" | "text"` - Output format (default: "markdown")
-- `timeout?: number` - Request timeout in milliseconds
+- `timeout?: number` - Request timeout in seconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
 - `includeUsage?: boolean` - Whether to include credit usage information in the response. NOTE:The value may be 0 if the total use of /extract and /map have not yet reached minimum requirements. See our [Credits & Pricing documentation]("https://docs.tavily.com/documentation/api-credits") for details.
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
@@ -157,6 +169,8 @@ const result = await generateText({
 - `extractDepth?: "basic" | "advanced"` - Override extraction depth per call
 - `instructions?: string` - Override or specify crawling instructions per call
 - `allowExternal?: boolean` - Override external domain crawling setting per call
+- `maxBreadth`, `limit`, `selectPaths`, `selectDomains`, `excludePaths`, `excludeDomains`, `format`, `timeout` (10-150 seconds), `includeImages`, `includeFavicon`, `includeUsage`
+- `chunksPerSource?: number` - Chunks per page (1-5); only sent together with `instructions`
 
 ### Tavily Map
 
@@ -179,15 +193,15 @@ const result = await generateText({
 **Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
 - `maxDepth?: number` - Maximum mapping depth (1-5, default: 1)
-- `maxBreadth?: number` - Maximum pages per depth level (1-100, default: 20)
+- `maxBreadth?: number` - Maximum links followed per page (1-500, default: 20)
 - `limit?: number` - Maximum total pages to map (default: 50)
 - `instructions?: string` - Natural language mapping instructions
 - `selectPaths?: string[]` - Path patterns to include (e.g., `["/docs/*"]`)
 - `selectDomains?: string[]` - Domains to include
 - `excludePaths?: string[]` - Path patterns to exclude (e.g., `["/api/*"]`)
 - `excludeDomains?: string[]` - Domains to exclude
-- `allowExternal?: boolean` - Allow mapping external domains (default: false)
-- `timeout?: number` - Request timeout in milliseconds
+- `allowExternal?: boolean` - Allow mapping external domains (default: true). Pass `allowExternal: false` to confine mapping to the root domain.
+- `timeout?: number` - Request timeout in seconds
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 - `includeUsage?: boolean` - Whether to include credit usage information in the response.NOTE:The value may be 0 if the total successful pages mapped has not yet reached 10 calls. See our [Credits & Pricing documentation]("https://docs.tavily.com/documentation/api-credits") for details.
@@ -197,7 +211,42 @@ const result = await generateText({
 - `maxDepth?: number` - Override maximum mapping depth per call
 - `instructions?: string` - Override or specify mapping instructions per call
 - `allowExternal?: boolean` - Override external domain mapping setting per call
+- `maxBreadth`, `limit`, `selectPaths`, `selectDomains`, `excludePaths`, `excludeDomains`, `timeout` (10-150 seconds), `includeUsage`
 
+
+### Tavily Research
+
+Research runs as a background task. `tavilyResearch` submits it and returns a `requestId`; `tavilyGetResearch` makes one status/result lookup using that ID. Register both tools so an agent can retrieve the completed report without starting the same work again:
+
+```typescript
+import { tavilyResearch, tavilyGetResearch } from "@tavily/ai-sdk";
+import { generateText, gateway, stepCountIs } from "ai";
+
+const result = await generateText({
+  model: gateway("openai/gpt-5-mini"),
+  prompt: "Start research on grid-scale battery storage. Return the task ID if it is still running.",
+  tools: {
+    research: tavilyResearch({
+      model: "pro",
+      outputLength: "standard",
+      citationFormat: "numbered",
+      includeDomains: ["energy.gov"],
+    }),
+    researchStatus: tavilyGetResearch({ includeUsage: true }),
+  },
+  stopWhen: stepCountIs(2),
+});
+```
+
+Save the task ID from the tool result in application state. On a later turn or scheduled job, call `tavilyGetResearch` with `{ requestId }`; the lookup is also available directly through the tool's `execute` function. `pending` and `in_progress` are unfinished; `completed` includes `content` and `sources`, and `failed` retains the service's error details. Do not treat a task ID as the report or repeatedly resubmit while waiting. Scheduling, polling intervals and any overall job deadline belong to the application. These tools intentionally use non-streaming submission and a separate result lookup, so no SSE output is truncated or mistaken for completion.
+
+**Research configuration and agent input:** `model` (`mini`, `pro`, `auto`), `outputSchema`, `citationFormat` (`numbered`, `mla`, `apa`, `chicago`), `includeDomains` (up to 20; preference), `excludeDomains` (up to 20; blocklist), `outputLength` (`short`, `standard`, `long`), and `files`. Submission additionally requires `input`. Model-supplied values override configuration defaults; omitted values preserve them. Keep application policy outside model-overridable defaults if it must be enforced.
+
+`outputSchema` must contain a `properties` object and can include `required`; nested JSON Schema keys and structured report keys are preserved. `files` accepts up to five `{ name, data, type?: "base64" }` entries with `.txt`, `.md`, or `.json` filenames and base64 contents. The service enforces an 80,000-word combined limit. Prefer configuring large file payloads in application code instead of asking the model to generate base64. Web/file source metadata, citations, usage and additional result fields are preserved. Known result envelope names use `requestId`, `createdAt` and `responseTime`, consistent with the other tools.
+
+Both factories accept the same API key, base URL, proxy and attribution options as the other tools. Research submission's configuration-only `timeout` is an HTTP timeout in seconds (default 60), not the research job deadline. Result lookups use the SDK's 60-second HTTP timeout and accept `includeUsage` in configuration or tool input. The API key remains configuration-only.
+
+See the public [Research create](https://docs.tavily.com/documentation/api-reference/endpoint/research) and [status/result](https://docs.tavily.com/documentation/api-reference/endpoint/research-get) contracts.
 
 ## Using Multiple Tools Together
 
@@ -236,11 +285,17 @@ const result = await generateText({
 npm install
 ```
 
-3. Create a `.env` file:
+3. For live examples only, create an ignored `.env` file:
 
 ```bash
 TAVILY_API_KEY=tvly-your-api-key
 ```
+
+### Offline validation
+
+`npm test` exercises schemas, parameter mapping, and Research HTTP201/202/completed/failed responses with a loopback fixture. `npm run build` builds the package and declarations. No real key is needed for tests.
+
+To test a packed consumer, run `npm pack`, install the tarball into a temporary project with `ai@5` + `@ai-sdk/openai@2` or `ai@6` + `@ai-sdk/openai@3` and `zod@4`, then copy and run `tests/consumer.mjs` there. It uses the real AI SDK tool loop and OpenAI chat adapter, a deterministic provider response fixture, and a local Tavily HTTP server. It does not contact either provider. `tests/consumer-types.ts` can also be compiled in that project to check the published declarations.
 
 ## API Reference
 
