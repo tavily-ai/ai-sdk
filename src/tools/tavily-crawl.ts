@@ -21,6 +21,7 @@ export const tavilyCrawl = (options: TavilyCrawlOptions = {}) => {
       .describe("The base URL to start crawling from"),
     maxDepth: z
       .number()
+      .int()
       .min(1)
       .max(5)
       .optional()

@@ -143,3 +143,27 @@ test("client-level settings are not repeated in the request body", async () => {
   await run(tavilySearch({ ...KEY, projectId: "p1", sessionId: "s1", humanId: "h1", clientName: "x", clientSource: "y", maxResults: 2 }), { query: "q" });
   assert.deepEqual(Object.keys(sent[0].body).sort(), ["max_results", "query"]);
 });
+
+test("Search developer defaults for beta fields map to API names and explicit false wins", async () => {
+  sent.length = 0; reply = searchReply;
+  const t = tavilySearch({ ...KEY, safeSearch: true, includePublishedDate: true, filterByPublishedDate: true } as any);
+  await run(t, { query: "q" });
+  assert.equal(sent[0].body.safe_search, true);
+  assert.equal(sent[0].body.include_published_date, true);
+  assert.equal(sent[0].body.filter_by_published_date, true);
+  assert.equal("safeSearch" in sent[0].body, false);
+  assert.equal("includePublishedDate" in sent[0].body, false);
+  sent.length = 0;
+  await run(t, { query: "q", safeSearch: false, includePublishedDate: false, filterByPublishedDate: false });
+  assert.equal(sent[0].body.safe_search, false);
+  assert.equal(sent[0].body.include_published_date, false);
+  assert.equal(sent[0].body.filter_by_published_date, false);
+});
+
+test("Map/Crawl traversal depth is an integer in the tool schema", () => {
+  for (const factory of [tavilyMap, tavilyCrawl]) {
+    const schema = factory(KEY).inputSchema as any;
+    assert.equal(schema.safeParse({ url: "https://example.com", maxDepth: 1.5 }).success, false);
+    assert.equal(schema.safeParse({ url: "https://example.com", maxDepth: 5 }).success, true);
+  }
+});

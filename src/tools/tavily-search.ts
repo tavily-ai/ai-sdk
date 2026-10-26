@@ -7,7 +7,11 @@ import type {
 import { createTavilyClient, requestOptions } from "../client";
 import { validateSearchParams } from "../validate";
 
-type TavilySearchOptions = TavilyClientOptions & Partial<CoreSearchOptions>;
+type TavilySearchOptions = TavilyClientOptions & Partial<CoreSearchOptions> & {
+  safeSearch?: boolean;
+  includePublishedDate?: boolean;
+  filterByPublishedDate?: boolean;
+};
 
 /**
  * Tavily Search tool for AI SDK
@@ -133,13 +137,14 @@ export const tavilySearch = (options: TavilySearchOptions = {}) => {
       "Search the web for real-time information using Tavily's AI-optimized search engine. Returns relevant sources, snippets, and optional AI-generated answers.",
     inputSchema,
     execute: async (input: z.infer<typeof inputSchema>) => {
-      const { query, includePublishedDate, filterByPublishedDate, safeSearch, ...rest } = input;
+      const { query, ...rest } = input;
       // Only keys the model supplied override the developer's defaults from `options`.
       const supplied = Object.fromEntries(Object.entries(rest).filter(([, v]) => v !== undefined));
       const merged: Record<string, any> = { ...requestOptions(options), ...supplied };
-      validateSearchParams({ ...merged, safeSearch });
+      validateSearchParams(merged);
+      const { safeSearch, includePublishedDate, filterByPublishedDate, ...coreOptions } = merged;
       return await client.search(query, {
-        ...merged,
+        ...coreOptions,
         // Not named options in the SDK yet; its extra-parameter passthrough sends them as snake_case.
         ...(safeSearch !== undefined && { safe_search: safeSearch }),
         ...(includePublishedDate !== undefined && { include_published_date: includePublishedDate }),

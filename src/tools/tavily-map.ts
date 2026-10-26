@@ -21,6 +21,7 @@ export const tavilyMap = (options: TavilyMapOptions = {}) => {
       .describe("The base URL to start mapping from"),
     maxDepth: z
       .number()
+      .int()
       .min(1)
       .max(5)
       .optional()
