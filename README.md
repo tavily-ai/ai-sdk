@@ -57,11 +57,11 @@ const result = await generateText({
 
 **Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
-- `searchDepth?: "basic" | "advanced"` - Search depth (default: "basic")
+- `searchDepth?: "basic" | "advanced" | "fast" | "ultra-fast"` - Search depth (default: "basic")
 - `topic?: "general" | "news" | "finance"` - Search category (default: "general")
 - `includeImages?: boolean` - Include images in results (default: false)
 - `includeAnswer?: boolean` - Include AI-generated answer (default: false)
-- `maxResults?: number` - Maximum results to return (default: 5)
+- `maxResults?: number` - Maximum results to return (default: 10)
 - `includeImageDescriptions?: boolean` - Include AI-generated image descriptions
 - `includeRawContent?: false | "markdown" | "text"` - Include raw content in specified format
 - `includeDomains?: string[]` - List of domains to include in search
@@ -77,8 +77,14 @@ const result = await generateText({
 - `timeout?: number` - Request timeout in milliseconds
 - `includeFavicon?: boolean` - Include favicon URLs in results
 - `includeUsage?: boolean` - Whether to include credit usage information in the response.
+- `includeDomainsMode?: "prefer" | "restrict"` - With `includeDomains`, boost those domains or return only them
+- `language?: string` / `filterByLanguage?: boolean` - Boost results in a language, or return only that language
+- `exactMatch?: boolean` - Require the quoted phrases in the query
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
+- `clientName?: string` - Identity sent to Tavily (default: `"ai-sdk"`); `clientSource` is left to the SDK
+
+**Input Parameters (for AI agent):** `query` (required), `searchDepth`, `topic`, `maxResults`, `chunksPerSource` (1-3; basic, advanced and fast), `timeRange`, `startDate`, `endDate`, `country`, `includeDomains`, `excludeDomains`, `includeDomainsMode`, `language`, `filterByLanguage`, `safeSearch`, `exactMatch`, `autoParameters`, `includeAnswer`, `includeRawContent`, `includeImages`, `includeImageDescriptions`, `includeFavicon`, `includePublishedDate` (beta), `filterByPublishedDate` (beta), `includeUsage`. Values the agent leaves out fall back to the configuration above. Combinations the API rejects (for example `includeDomainsMode` without `includeDomains`, `safeSearch` with `fast`/`ultra-fast`) fail before a request is sent.
 
 ### Tavily Extract
 
@@ -110,8 +116,11 @@ const result = await generateText({
 - `apiBaseURL?: string` - Custom API base URL
 
 **Input Parameters (for AI agent):**
-- `urls: string[]` - Array of URLs to extract content from (required)
+- `urls: string[]` - 1-20 URLs to extract content from (required)
 - `extractDepth?: "basic" | "advanced"` - Override extraction depth per call
+- `query?: string` - Intent used to rerank content chunks
+- `chunksPerSource?: number` - Chunks per URL (1-5; requires `query`)
+- `format?: "markdown" | "text"`, `timeout?: number` (1-60 seconds), `includeImages?: boolean`, `includeFavicon?: boolean`, `includeUsage?: boolean`
 
 ### Tavily Crawl
 
@@ -134,7 +143,7 @@ const result = await generateText({
 **Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
 - `maxDepth?: number` - Maximum crawl depth (1-5, default: 1)
-- `maxBreadth?: number` - Maximum pages per depth level (1-100, default: 20)
+- `maxBreadth?: number` - Maximum links followed per page (1-500, default: 20)
 - `limit?: number` - Maximum total pages to crawl (default: 50)
 - `extractDepth?: "basic" | "advanced"` - Content extraction depth
 - `instructions?: string` - Natural language crawling instructions
@@ -157,6 +166,8 @@ const result = await generateText({
 - `extractDepth?: "basic" | "advanced"` - Override extraction depth per call
 - `instructions?: string` - Override or specify crawling instructions per call
 - `allowExternal?: boolean` - Override external domain crawling setting per call
+- `maxBreadth`, `limit`, `selectPaths`, `selectDomains`, `excludePaths`, `excludeDomains`, `format`, `timeout` (10-150 seconds), `includeImages`, `includeFavicon`, `includeUsage`
+- `chunksPerSource?: number` - Chunks per page (1-5); only sent together with `instructions`
 
 ### Tavily Map
 
@@ -179,7 +190,7 @@ const result = await generateText({
 **Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
 - `maxDepth?: number` - Maximum mapping depth (1-5, default: 1)
-- `maxBreadth?: number` - Maximum pages per depth level (1-100, default: 20)
+- `maxBreadth?: number` - Maximum links followed per page (1-500, default: 20)
 - `limit?: number` - Maximum total pages to map (default: 50)
 - `instructions?: string` - Natural language mapping instructions
 - `selectPaths?: string[]` - Path patterns to include (e.g., `["/docs/*"]`)
@@ -197,6 +208,7 @@ const result = await generateText({
 - `maxDepth?: number` - Override maximum mapping depth per call
 - `instructions?: string` - Override or specify mapping instructions per call
 - `allowExternal?: boolean` - Override external domain mapping setting per call
+- `maxBreadth`, `limit`, `selectPaths`, `selectDomains`, `excludePaths`, `excludeDomains`, `timeout` (10-150 seconds), `includeUsage`
 
 
 ## Using Multiple Tools Together

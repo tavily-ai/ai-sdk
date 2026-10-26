@@ -17,7 +17,8 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "test": "node --import tsx --test tests/*.test.ts"
   },
   "keywords": [
     "ai",
@@ -49,7 +50,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@tavily/core": "^0.7.2"
+    "@tavily/core": "^0.7.14"
   },
   "peerDependencies": {
     "ai": "^5.0.0 || ^6.0.0",
