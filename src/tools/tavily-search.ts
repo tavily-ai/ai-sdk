@@ -1,7 +1,8 @@
 import { tool } from "ai";
-import { z } from "zod";
 import { tavily } from "@tavily/core";
-import type { 
+import { searchAgentInputSchema } from "@tavily/core/agent-schemas";
+import type { SearchAgentInput } from "@tavily/core/agent-schemas";
+import type {
   TavilySearchOptions as CoreSearchOptions,
   TavilyClientOptions
 } from "@tavily/core";
@@ -14,43 +15,17 @@ type TavilySearchOptions = TavilyClientOptions & Partial<CoreSearchOptions>;
  */
 export const tavilySearch = (options: TavilySearchOptions = {}) => {
   const client = tavily({ ...options, clientSource: "ai-sdk" } as TavilyClientOptions);
-  
-  const inputSchema = z.object({
-    query: z
-      .string()
-      .describe("The search query to look up on the web"),
-    searchDepth: z
-      .enum(["basic", "advanced", "fast", "ultra-fast"])
-      .optional()
-      .describe(
-        "The depth of the search - 'basic' for quick results, 'advanced' for comprehensive search, 'fast' for low latency with high relevance (BETA), 'ultra-fast' prioritizes latency above all (BETA)"
-      ),
-    timeRange: z
-      .enum(["year", "month", "week", "day", "y", "m", "w", "d"])
-      .optional()
-      .describe("Time range for search results"),
-    exactMatch: z
-      .boolean()
-      .optional()
-      .describe("Only return results containing the exact phrase(s) in quotes in your query")
-  });
 
   return tool({
     description:
       "Search the web for real-time information using Tavily's AI-optimized search engine. Returns relevant sources, snippets, and optional AI-generated answers.",
-    inputSchema,
-    execute: async ({
-      query,
-      searchDepth: inputSearchDepth,
-      timeRange: inputTimeRange,
-      exactMatch: inputExactMatch,
-    }: z.infer<typeof inputSchema>) => {
-      return await client.search(query, {
-        ...options,
-        searchDepth: (inputSearchDepth ?? options.searchDepth) as "basic" | "advanced" | undefined,
-        timeRange: inputTimeRange ?? options.timeRange,
-        ...(inputExactMatch !== undefined && { exactMatch: inputExactMatch }),
-      });
+    inputSchema: searchAgentInputSchema,
+    execute: async ({ query, ...input }: SearchAgentInput) => {
+      // Model-provided values override configured defaults; omitted fields keep them.
+      const overrides = Object.fromEntries(
+        Object.entries(input).filter(([, value]) => value !== undefined)
+      );
+      return await client.search(query, { ...options, ...overrides });
     },
   });
 };
