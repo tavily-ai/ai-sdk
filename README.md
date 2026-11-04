@@ -57,16 +57,16 @@ const result = await generateText({
 
 **Configuration Options:**
 - `apiKey?: string` - Tavily API key (defaults to `TAVILY_API_KEY` env var)
-- `searchDepth?: "basic" | "advanced"` - Search depth (default: "basic")
+- `searchDepth?: "basic" | "advanced" | "fast" | "ultra-fast"` - Search depth (default: "basic")
 - `topic?: "general" | "news" | "finance"` - Search category (default: "general")
 - `includeImages?: boolean` - Include images in results (default: false)
-- `includeAnswer?: boolean` - Include AI-generated answer (default: false)
+- `includeAnswer?: boolean | "basic" | "advanced"` - Include AI-generated answer (default: false)
 - `maxResults?: number` - Maximum results to return (default: 5)
 - `includeImageDescriptions?: boolean` - Include AI-generated image descriptions
 - `includeRawContent?: false | "markdown" | "text"` - Include raw content in specified format
 - `includeDomains?: string[]` - List of domains to include in search
 - `excludeDomains?: string[]` - List of domains to exclude from search
-- `maxTokens?: number` - Maximum number of tokens in response
+- `includeDomainsMode?: "restrict" | "prefer"` - Whether `includeDomains` restricts or only prefers those domains
 - `timeRange?: "year" | "month" | "week" | "day" | "y" | "m" | "w" | "d"` - Time range for results
 - `chunksPerSource?: number` - Number of content chunks per source
 - `country?: string` - Country code for localized results
@@ -74,9 +74,18 @@ const result = await generateText({
 - `endDate?: string` - End date for results (YYYY-MM-DD format)
 - `days?: number` - Number of days back to search (for news/finance topics)
 - `autoParameters?: boolean` - Enable automatic parameter optimization
-- `timeout?: number` - Request timeout in milliseconds
+- `timeout?: number` - Request timeout in seconds (default: 60)
 - `includeFavicon?: boolean` - Include favicon URLs in results
 - `includeUsage?: boolean` - Whether to include credit usage information in the response.
+- `exactMatch?: boolean` - Only return results containing the exact phrase(s) in quotes in your query
+- `maxAgeHours?: number` - Maximum acceptable cache age in hours
+- `fetchTimeout?: number` - Live-fetch time budget in seconds
+- `cacheFallback?: boolean` - Allow cached content when live fetching fails
+- `language?: string` - Preferred content language
+- `filterByLanguage?: boolean` - Restrict results to the requested language
+- `safeSearch?: boolean` - Filter explicit content from results
+- `includePublishedDate?: boolean` - Include detected publication dates
+- `filterByPublishedDate?: boolean` - Exclude undated results and results outside the date window (also enables publication dates)
 - `proxies?: { http?: string, https?: string }` - HTTP/HTTPS proxy configuration
 - `apiBaseURL?: string` - Custom API base URL
 
