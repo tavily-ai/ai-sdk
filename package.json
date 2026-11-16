@@ -1,7 +1,7 @@
 {
   "name": "@tavily/ai-sdk",
-  "version": "0.5.0",
-  "description": "Tavily AI SDK tools - Search, Extract, Crawl, and Map",
+  "version": "0.6.0",
+  "description": "Tavily AI SDK tools - Search, Extract, Crawl, Map, and Research",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -17,7 +17,10 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
-    "prepublishOnly": "pnpm build"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm build",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:consumers": "tests/run-consumers.sh"
   },
   "keywords": [
     "ai",
@@ -41,18 +44,21 @@
   },
   "packageManager": "pnpm@10.8.0",
   "devDependencies": {
-    "@ai-sdk/openai": "^3.0.112",
-    "@types/node": "^24.10.1",
-    "dotenv": "^17.2.3",
-    "tsup": "^8.5.0",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "@ai-sdk/openai": "^4.0.118",
+    "@types/node": "^26.6.6",
+    "ai": "^7.0.173",
+    "axios": "^1",
+    "dotenv": "^18.0.10",
+    "tsup": "^9.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "zod": "^4.6.7"
   },
   "dependencies": {
-    "@tavily/core": "^0.7.2"
+    "@tavily/core": "^1.1.0"
   },
   "peerDependencies": {
-    "ai": "^5.0.0 || ^6.0.0",
-    "zod": "^4.0.0"
+    "ai": "^5.0.0 || ^6.0.0 || ^7.0.0",
+    "zod": "^4.1.8"
   }
 }
